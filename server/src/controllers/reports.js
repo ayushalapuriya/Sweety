@@ -23,9 +23,17 @@ async function readingsBetween(userId, start, end) {
 }
 
 export async function trendReport(req, res) {
-  const { start } = getMonthRange(req.query.date);
-  const endDate = new Date(`${req.query.date}T00:00:00Z`);
-  endDate.setUTCDate(endDate.getUTCDate() + 1);
+  let { start } = getMonthRange(req.query.date);
+  let endDate = new Date(`${req.query.date}T00:00:00Z`);
+  if (req.query.period === 'previous') {
+    const currentMonth = new Date(`${start}T00:00:00Z`);
+    const currentMonthStart = start;
+    currentMonth.setUTCMonth(currentMonth.getUTCMonth() - 1);
+    start = currentMonth.toISOString().slice(0, 8) + '01';
+    endDate = new Date(`${currentMonthStart}T00:00:00Z`);
+  } else {
+    endDate.setUTCDate(endDate.getUTCDate() + 1);
+  }
   const readings = await readingsBetween(req.user.id, start, endDate.toISOString().slice(0, 10));
   const byDate = readings.reduce((result, reading) => {
     result[reading.date] ??= [];
@@ -69,7 +77,9 @@ export async function monthlyReport(req, res) {
   previous.setUTCMonth(previous.getUTCMonth() - 1);
   const previousStart = previous.toISOString().slice(0, 8) + '01';
   const readings = await readingsBetween(req.user.id, previousStart, start);
-  const report = { type: 'monthly', start: previousStart, end: start, ...summarize(readings) };
+  const previousEnd = new Date(`${start}T00:00:00Z`);
+  previousEnd.setUTCDate(previousEnd.getUTCDate() - 1);
+  const report = { type: 'monthly', start: previousStart, end: previousEnd.toISOString().slice(0, 10), ...summarize(readings) };
   await setCache(cacheKey, report);
   res.json({ report });
 }
