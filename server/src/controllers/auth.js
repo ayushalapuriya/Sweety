@@ -3,6 +3,11 @@ import jwt from 'jsonwebtoken';
 import { pool } from '../db/pool.js';
 
 function tokenFor(user) {
+  if (!process.env.JWT_SECRET) {
+    const error = new Error('JWT_SECRET is not configured.');
+    error.code = 'CONFIG_MISSING';
+    throw error;
+  }
   return jwt.sign({ id: user.id, name: user.name, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
 }
 

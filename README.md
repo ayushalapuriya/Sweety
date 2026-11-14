@@ -43,6 +43,8 @@ Sweety is a full-stack blood glucose tracker for recording daily readings and re
    CLIENT_URL=http://localhost:5173
    ```
 
+   `JWT_SECRET` is required for signup and login. Use any long random string for local development, then restart the API after changing `.env`.
+
 4. Install dependencies:
 
    ```bash
