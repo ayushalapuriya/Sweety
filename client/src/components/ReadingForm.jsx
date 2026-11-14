@@ -5,6 +5,7 @@ import { SLOT_LABELS, SLOT_ORDER, today } from '../utils';
 import { useNotify } from '../context/NotificationContext';
 
 export default function ReadingForm({ date, reading, onSaved, onCancel }) {
+  const existingReading = reading?.id ? reading : null;
   const [form, setForm] = useState({ date: reading?.date || date, timeSlot: reading?.timeSlot || 'morning', glucoseValue: reading?.glucoseValue ?? '' });
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState({});
@@ -23,7 +24,7 @@ export default function ReadingForm({ date, reading, onSaved, onCancel }) {
     const nextErrors = {}; ['date', 'timeSlot', 'glucoseValue'].forEach((field) => { const message = validateField(field); if (message) nextErrors[field] = message; }); setFieldErrors(nextErrors);
     if (Object.keys(nextErrors).length) return setError('Please fix the highlighted fields.');
     setSaving(true);
-    try { await request(reading ? api.put(`/readings/${reading.id}`, form) : api.post('/readings', form)); notify(reading ? 'Reading updated successfully.' : 'Reading saved successfully.', 'success'); onSaved(); }
+    try { await request(existingReading ? api.put(`/readings/${existingReading.id}`, form) : api.post('/readings', form)); notify(existingReading ? 'Reading updated successfully.' : 'Reading saved successfully.', 'success'); onSaved(); }
     catch (err) { setError(err.message); notify(err.message, 'error'); } finally { setSaving(false); }
   }
   return <form onSubmit={submit} className="reading-form">

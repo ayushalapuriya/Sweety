@@ -41,6 +41,8 @@ export async function updateReading(req, res) {
   if (errors.length) return res.status(400).json({ message: errors[0] });
   const existing = await pool.query('SELECT id FROM readings WHERE user_id = $1 AND id = $2', [req.user.id, req.params.id]);
   if (!existing.rowCount) return res.status(404).json({ message: 'Reading not found.' });
+  const targetCount = await pool.query('SELECT COUNT(*)::int AS count FROM readings WHERE user_id = $1 AND date = $2 AND id <> $3', [req.user.id, req.body.date, req.params.id]);
+  if (targetCount.rows[0].count >= 4) return res.status(400).json({ message: 'You can add only 4 readings per day.' });
   const duplicate = await pool.query('SELECT id FROM readings WHERE user_id = $1 AND date = $2 AND time_slot = $3 AND id <> $4', [req.user.id, req.body.date, req.body.timeSlot, req.params.id]);
   if (duplicate.rowCount) return res.status(400).json({ message: `You already have a ${TIME_SLOTS[req.body.timeSlot]} reading for this date.` });
   const { rows } = await pool.query(

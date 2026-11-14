@@ -2,6 +2,8 @@
 
 Sweety is a full-stack blood glucose tracker for recording daily readings and reviewing daily and monthly summaries.
 
+See [CHECKLIST.md](./CHECKLIST.md) for the assignment requirement, bonus-task, and submission status checklist.
+
 ## Requirements
 
 - Node.js 18+
@@ -87,4 +89,11 @@ Sweety is a full-stack blood glucose tracker for recording daily readings and re
 npm test
 ```
 
-The server test suite covers authentication, password hashing, reading validation, ownership, and report calculations. For a production deployment, set `CLIENT_URL` to the deployed frontend origin and use a managed PostgreSQL database.
+The server test suite covers password hashing, reading validation, and report calculations. For a production deployment, set `CLIENT_URL` to the deployed frontend origin and use a managed PostgreSQL database.
+
+## Notes
+
+- The application enforces one reading per user, date, and time slot through both API validation and a PostgreSQL unique constraint.
+- Dates are stored as PostgreSQL `DATE` values, so reports use calendar dates rather than browser timezone timestamps.
+- The optional bonus features (pagination, charts, Docker, Redis/BullMQ, and doctor roles) are not included; the required workflow was prioritized.
+- Screenshots can be captured from the running frontend after seeding the demo account. This workspace is not connected to a public GitHub repository, so the repository link and regular commit history must be created during submission.
