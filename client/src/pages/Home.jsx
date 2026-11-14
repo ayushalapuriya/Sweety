@@ -1,4 +1,4 @@
-import { ArrowRight, BarChart3, Check, HeartPulse, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, BarChart3, Check, Clock3, Droplets, HeartPulse, ShieldCheck, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Logo from '../components/Logo';
 
@@ -39,6 +39,10 @@ export default function Home() {
       <section className="care-section" id="care">
         <div className="care-illustration"><HeartPulse size={30} /></div>
         <div><p className="eyebrow">Your care, simplified</p><h2>Make room for what matters.</h2><p>Whether you’re checking in at home or sharing progress with your care team, Sweety gives you a calm, reliable place for your everyday numbers.</p><div className="care-points"><span><Check size={15} /> Private by design</span><span><Check size={15} /> Clear summaries</span><span><Check size={15} /> Easy daily tracking</span></div></div>
+      </section>
+      <section className="routine-section">
+        <div className="routine-heading"><p className="eyebrow">A routine that works with you</p><h2>Small check-ins can make a <em>big difference.</em></h2><p>Keep your care simple with a gentle rhythm you can return to every day.</p></div>
+        <div className="routine-grid"><article><span className="routine-number">01</span><Clock3 size={22} /><h3>Choose your moment</h3><p>Track before or after meals, whenever it fits naturally into your day.</p></article><article><span className="routine-number">02</span><Droplets size={22} /><h3>Record in seconds</h3><p>Add a reading with a clear time slot and keep your daily log complete.</p></article><article><span className="routine-number">03</span><BarChart3 size={22} /><h3>Learn from your trends</h3><p>Review your summaries and bring clearer insights to your care conversations.</p></article></div>
       </section>
     </main>
     <footer className="home-footer"><div className="home-footer-inner"><div className="footer-main"><div className="footer-brand"><Logo /><p>Simple, thoughtful glucose tracking<br />for your everyday care.</p></div><div className="footer-links"><div><b>Explore</b><a href="#how-it-works">How it works</a><a href="#care">Your care, simplified</a></div><div><b>Account</b><Link to="/login">Log in</Link><Link to="/signup">Create an account</Link></div></div><div className="footer-cta-card"><span className="footer-cta-icon"><HeartPulse size={18} /></span><b>Ready to feel more in control?</b><p>Start your wellness journey today.</p><Link to="/signup" className="footer-cta">Get started <ArrowRight size={14} /></Link></div></div><div className="footer-bottom"><span>© 2026 Sweety. Made for everyday wellness.</span><span className="footer-secure"><ShieldCheck size={14} /> Your data stays private and secure.</span></div></div></footer>
