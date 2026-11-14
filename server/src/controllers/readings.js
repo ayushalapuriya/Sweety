@@ -1,19 +1,25 @@
 import { pool } from '../db/pool.js';
 import { TIME_SLOTS } from '../constants.js';
 import { validateReading } from '../validation/readings.js';
+import { clearReportCache } from '../cache.js';
 
 const select = `SELECT id, date::text, time_slot AS "timeSlot", glucose_value AS "glucoseValue", created_at AS "createdAt", updated_at AS "updatedAt" FROM readings`;
 
 export async function listReadings(req, res) {
+  const page = Math.max(Number.parseInt(req.query.page, 10) || 1, 1);
+  const limit = Math.min(Math.max(Number.parseInt(req.query.limit, 10) || 20, 1), 100);
   const params = [req.user.id];
   let query = `${select} WHERE user_id = $1`;
   if (req.query.date) {
     params.push(req.query.date);
     query += ` AND date = $${params.length}`;
   }
-  query += ' ORDER BY date DESC, created_at ASC';
+  const countQuery = query.replace(select, 'SELECT COUNT(*)::int AS count FROM readings');
+  const count = await pool.query(countQuery, params);
+  params.push(limit, (page - 1) * limit);
+  query += ` ORDER BY date DESC, created_at ASC LIMIT $${params.length - 1} OFFSET $${params.length}`;
   const { rows } = await pool.query(query, params);
-  res.json({ readings: rows });
+  res.json({ readings: rows, pagination: { page, limit, total: count.rows[0].count, pages: Math.ceil(count.rows[0].count / limit) } });
 }
 
 export async function getReading(req, res) {
@@ -33,6 +39,7 @@ export async function createReading(req, res) {
     `INSERT INTO readings (user_id, date, time_slot, glucose_value) VALUES ($1, $2, $3, $4) RETURNING id, date::text, time_slot AS "timeSlot", glucose_value AS "glucoseValue"`,
     [req.user.id, req.body.date, req.body.timeSlot, Number(req.body.glucoseValue)]
   );
+  await clearReportCache(req.user.id);
   res.status(201).json({ reading: rows[0] });
 }
 
@@ -50,11 +57,13 @@ export async function updateReading(req, res) {
      RETURNING id, date::text, time_slot AS "timeSlot", glucose_value AS "glucoseValue"`,
     [req.body.date, req.body.timeSlot, Number(req.body.glucoseValue), req.user.id, req.params.id]
   );
+  await clearReportCache(req.user.id);
   res.json({ reading: rows[0] });
 }
 
 export async function deleteReading(req, res) {
   const result = await pool.query('DELETE FROM readings WHERE user_id = $1 AND id = $2', [req.user.id, req.params.id]);
   if (!result.rowCount) return res.status(404).json({ message: 'Reading not found.' });
+  await clearReportCache(req.user.id);
   res.status(204).end();
 }

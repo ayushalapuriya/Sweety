@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { register, login } from './controllers/auth.js';
 import { requireAuth } from './middleware/auth.js';
 import { createReading, deleteReading, getReading, listReadings, updateReading } from './controllers/readings.js';
-import { dailyReport, monthToDateReport, monthlyReport } from './controllers/reports.js';
+import { dailyReport, monthToDateReport, monthlyReport, trendReport } from './controllers/reports.js';
+import { listPatients, patientReport } from './controllers/doctor.js';
 
 export const router = Router();
 router.post('/auth/register', register);
@@ -16,3 +17,6 @@ router.delete('/readings/:id', deleteReading);
 router.get('/reports/daily', dailyReport);
 router.get('/reports/month-to-date', monthToDateReport);
 router.get('/reports/monthly', monthlyReport);
+router.get('/reports/trend', trendReport);
+router.get('/doctor/patients', listPatients);
+router.get('/doctor/patients/:patientId/report', patientReport);

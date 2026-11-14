@@ -67,6 +67,8 @@ See [CHECKLIST.md](./CHECKLIST.md) for the assignment requirement, bonus-task, a
 
    Demo login: `demo@sweety.app` / `Password123!`
 
+   Demo doctor login: `doctor@sweety.app` / `Doctor123!` (assigned to the demo patient).
+
 7. Start both applications:
 
    ```bash
@@ -74,6 +76,25 @@ See [CHECKLIST.md](./CHECKLIST.md) for the assignment requirement, bonus-task, a
    ```
 
    The frontend runs at http://localhost:5173 and the API at http://localhost:4000.
+
+## Docker
+
+The public [Dockerfile](./Dockerfile) and [docker-compose.yml](./docker-compose.yml) contain no real secrets. Before starting Docker, create a local root `.env` file:
+
+```env
+POSTGRES_DB=sweety
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=choose-a-local-password
+JWT_SECRET=choose-a-long-local-secret
+```
+
+Then run:
+
+```powershell
+docker compose up --build
+```
+
+The root `.env` is ignored by Git and must never be committed. `.env.example` is safe to commit.
 
 ## PostgreSQL troubleshooting
 
@@ -95,5 +116,5 @@ The server test suite covers password hashing, reading validation, and report ca
 
 - The application enforces one reading per user, date, and time slot through both API validation and a PostgreSQL unique constraint.
 - Dates are stored as PostgreSQL `DATE` values, so reports use calendar dates rather than browser timezone timestamps.
-- The optional bonus features (pagination, charts, Docker, Redis/BullMQ, and doctor roles) are not included; the required workflow was prioritized.
+- Bonus features are implemented as optional extensions: pagination, a trend chart, Docker Compose, Redis report caching, a BullMQ reminder scheduler, and doctor/patient report access. Redis-backed features remain disabled unless `REDIS_URL` is configured.
 - Screenshots can be captured from the running frontend after seeding the demo account. This workspace is not connected to a public GitHub repository, so the repository link and regular commit history must be created during submission.
