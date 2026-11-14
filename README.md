@@ -9,21 +9,53 @@ Sweety is a full-stack blood glucose tracker for recording daily readings and re
 
 ## Setup
 
-1. Create a PostgreSQL database named `sweety`.
-2. Copy `.env.example` to `server/.env` and set `DATABASE_URL` and `JWT_SECRET`.
-3. Install dependencies:
+1. Install PostgreSQL for Windows from https://www.postgresql.org/download/windows/.
+
+   During installation, remember the password you set for the `postgres` user. Keep the default port `5432`.
+
+2. Open **SQL Shell (psql)** from the Start menu and enter:
+
+   ```sql
+   CREATE DATABASE sweety;
+   \q
+   ```
+
+   Alternatively, from PowerShell, if `psql` is available on your PATH:
+
+   ```powershell
+   psql -U postgres -h localhost -p 5432
+   ```
+
+   Then run `CREATE DATABASE sweety;` and exit with `\q`.
+
+3. Copy the server environment file:
+
+   ```powershell
+   Copy-Item server\.env.example server\.env
+   ```
+
+   Open `server\.env` and set the PostgreSQL password in `DATABASE_URL`:
+
+   ```env
+   DATABASE_URL=postgresql://postgres:YOUR_POSTGRES_PASSWORD@localhost:5432/sweety
+   JWT_SECRET=replace-with-a-long-random-secret
+   PORT=4000
+   CLIENT_URL=http://localhost:5173
+   ```
+
+4. Install dependencies:
 
    ```bash
    npm install
    ```
 
-4. Create the database tables:
+5. Create the database tables:
 
    ```bash
    npm run db:migrate --workspace server
    ```
 
-5. (Optional) Seed a demo account:
+6. (Optional) Seed a demo account:
 
    ```bash
    npm run db:seed --workspace server
@@ -31,13 +63,21 @@ Sweety is a full-stack blood glucose tracker for recording daily readings and re
 
    Demo login: `demo@sweety.app` / `Password123!`
 
-6. Start both applications:
+7. Start both applications:
 
    ```bash
    npm run dev
    ```
 
    The frontend runs at http://localhost:5173 and the API at http://localhost:4000.
+
+## PostgreSQL troubleshooting
+
+- **`psql is not recognized`**: add PostgreSQL's `bin` folder to PATH, usually `C:\Program Files\PostgreSQL\<version>\bin`, then reopen PowerShell.
+- **`ECONNREFUSED localhost:5432`**: open Windows Services, find `postgresql-x64-*`, and start the PostgreSQL service.
+- **`EADDRINUSE :::4000`**: another API process is already running. Find it with `Get-NetTCPConnection -LocalPort 4000 -State Listen`, stop that specific process with `Stop-Process -Id <PID>`, then run the server again. You can also set `PORT=4001` in `server\.env`.
+- **`password authentication failed`**: update the password in `server\.env` to match the password created during PostgreSQL installation.
+- **Check the API connection**: open http://localhost:4000/api/health. It should return `{"ok":true}`. The migration command confirms the database credentials and database name.
 
 ## Tests
 
